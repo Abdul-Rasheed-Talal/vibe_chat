@@ -39,7 +39,7 @@ export default function SearchPage() {
     }
 
     return (
-        <div className="container max-w-2xl py-8">
+        <div className="container h-full overflow-y-auto max-w-2xl py-8">
             <h1 className="mb-6 text-2xl font-bold">Search</h1>
             <form onSubmit={handleSearch} className="mb-8 flex gap-2">
                 <Input
