@@ -83,7 +83,13 @@ export default function SettingsPage() {
         setSaving(true)
 
         try {
-            const result = await updateProfile(formData)
+            const formDataToSend = new FormData()
+            formDataToSend.append('username', formData.username)
+            formDataToSend.append('fullName', formData.full_name)
+            formDataToSend.append('avatarUrl', formData.avatar_url)
+            formDataToSend.append('status', formData.status)
+
+            const result = await updateProfile(formDataToSend)
             if (result?.error) {
                 alert(result.error)
             } else {
