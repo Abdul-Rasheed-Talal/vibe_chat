@@ -4,71 +4,85 @@
 
 @layer base {
   :root {
-    /* Light Neon Theme */
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Mode (Neon Pastel) */
+    --background: 220 33% 98%;
+    /* #F7F8FB */
+    --foreground: 222 47% 11%;
+    /* #111827 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Vibrant Purple/Pink */
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon Violet */
+    --primary: 252 100% 68%;
+    /* #7C5CFF */
+    --primary-foreground: 0 0% 100%;
+    --primary-500: 252 100% 68%;
 
-    --secondary: 316 73% 52%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Cyan Accent */
+    --accent: 190 100% 50%;
+    /* #00D4FF */
+    --accent-foreground: 222 47% 11%;
+    --accent-400: 190 100% 50%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --accent: 262 83% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262 83% 58%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 252 100% 68%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
+    /* 12px */
   }
 
   .dark {
-    /* Dark Neon Theme */
-    --background: 260 30% 8%;
-    /* Deep Purple/Black */
+    /* Dark Mode (Neon Glow) */
+    --background: 222 47% 6%;
+    /* #0B0E14 */
     --foreground: 210 40% 98%;
 
-    --card: 260 30% 12%;
+    --card: 220 26% 11%;
+    /* #151921 */
     --card-foreground: 210 40% 98%;
 
-    --popover: 260 30% 12%;
+    --popover: 220 26% 11%;
     --popover-foreground: 210 40% 98%;
 
-    /* Neon Purple */
-    --primary: 263 90% 65%;
+    /* Neon Violet Glow */
+    --primary: 252 100% 71%;
+    /* #8B6DFF */
     --primary-foreground: 210 40% 98%;
+    --primary-500: 252 100% 71%;
 
-    /* Neon Pink */
-    --secondary: 316 90% 60%;
+    /* Cyan Glow */
+    --accent: 186 100% 50%;
+    /* #00E5FF */
+    --accent-foreground: 210 40% 98%;
+    --accent-400: 186 100% 50%;
+
+    --secondary: 217 19% 27%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 260 20% 18%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 260 30% 20%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 30%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 260 30% 20%;
-    --input: 260 30% 20%;
-    --ring: 263 90% 65%;
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 252 100% 71%;
   }
 }
 

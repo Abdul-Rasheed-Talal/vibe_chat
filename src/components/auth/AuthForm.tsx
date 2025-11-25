@@ -24,7 +24,7 @@ export function AuthForm() {
     }
 
     return (
-        <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-xl border shadow-sm">
+        <div className="w-full p-8 space-y-6 bg-card/50 backdrop-blur-xl rounded-[32px] border border-white/10 shadow-2xl shadow-primary/5">
             <div className="space-y-2 text-center">
                 <h1 className="text-3xl font-bold tracking-tighter">
                     {isLogin ? 'Welcome back' : 'Create an account'}
@@ -133,7 +133,7 @@ export function AuthForm() {
                     </div>
                 )}
 
-                <Button type="submit" className="w-full" disabled={isPending}>
+                <Button type="submit" className="w-full h-12 text-base shadow-lg shadow-primary/25" disabled={isPending}>
                     {isPending ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

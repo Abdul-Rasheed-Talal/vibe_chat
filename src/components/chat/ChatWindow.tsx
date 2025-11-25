@@ -4,12 +4,14 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Send, ArrowLeft, Paperclip } from 'lucide-react'
+import { Send, ArrowLeft, Paperclip, Smile, Mic } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { sendMessage } from '@/app/actions/chat'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { AISuggestions } from '@/components/chat/AISuggestions'
+import { MessageBubble } from '@/components/chat/MessageBubble'
+import { LoadingPulse } from '@/components/ui/loading-pulse'
 
 type Message = {
     id: number
@@ -206,123 +208,134 @@ export function ChatWindow({
     }
 
     return (
-        <div className="flex h-full flex-col bg-background/50 backdrop-blur-sm">
-            <div className="flex items-center border-b border-border/40 p-4 gap-4 bg-card/30 backdrop-blur-md">
+        <div className="flex h-full flex-col bg-background/50 backdrop-blur-sm relative">
+            {/* Header */}
+            <div className="flex items-center border-b border-border/40 p-4 gap-4 bg-card/80 backdrop-blur-xl z-10 sticky top-0">
                 <Link href="/direct" className="md:hidden">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="rounded-full">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                 </Link>
 
                 {otherParticipant ? (
                     <>
-                        <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-                            <AvatarImage src={otherParticipant.avatar_url || ''} />
-                            <AvatarFallback>{otherParticipant.username[0]?.toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <div className="ml-2">
-                            <p className="font-semibold glow-text">{otherParticipant.username}</p>
-                            <p className="text-xs text-muted-foreground">
+                        <div className="relative">
+                            <Avatar className="h-10 w-10 ring-2 ring-background shadow-sm">
+                                <AvatarImage src={otherParticipant.avatar_url || ''} />
+                                <AvatarFallback>{otherParticipant.username[0]?.toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            {/* Online Status Dot */}
+                            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
+                        </div>
+                        <div className="ml-2 flex-1">
+                            <p className="font-bold text-sm glow-text">{otherParticipant.username}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
                                 {otherUserTyping ? (
-                                    <span className="animate-pulse text-primary">Typing...</span>
+                                    <span className="text-primary font-medium animate-pulse">Typing...</span>
                                 ) : 'Active now'}
                             </p>
                         </div>
                     </>
                 ) : (
                     <div className="ml-2">
-                        <p className="font-semibold glow-text">Group Chat</p>
-                        {otherUserTyping && <p className="text-xs text-muted-foreground animate-pulse text-primary">Someone is typing...</p>}
+                        <p className="font-bold text-sm glow-text">Group Chat</p>
+                        {otherUserTyping && <p className="text-xs text-primary animate-pulse">Someone is typing...</p>}
                     </div>
                 )}
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Messages Area */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
                 <AnimatePresence initial={false}>
-                    {messages.map((msg) => {
-                        const isMe = msg.sender_id === currentUser.id
-                        return (
-                            <motion.div
-                                key={msg.id}
-                                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                            >
-                                <div
-                                    className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm transition-all hover:scale-[1.02] ${isMe
-                                        ? 'bg-primary text-primary-foreground glow-box'
-                                        : 'bg-card border border-border/50 text-foreground'
-                                        }`}
-                                >
-                                    {msg.attachments?.map((att, i) => (
-                                        <div key={i} className="mb-2">
-                                            {att.type === 'image' ? (
-                                                <img src={att.url} alt="attachment" className="max-w-full rounded-lg" />
-                                            ) : (
-                                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="underline text-xs">
-                                                    {att.name}
-                                                </a>
-                                            )}
-                                        </div>
-                                    ))}
-                                    {msg.content && <p>{msg.content}</p>}
-                                </div>
-                            </motion.div>
-                        )
-                    })}
+                    {messages.map((msg) => (
+                        <MessageBubble
+                            key={msg.id}
+                            message={msg}
+                            isMe={msg.sender_id === currentUser.id}
+                        />
+                    ))}
                 </AnimatePresence>
+
+                {/* Typing Indicator Bubble */}
                 {otherUserTyping && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
                         className="flex justify-start"
                     >
-                        <div className="bg-muted px-4 py-2 rounded-2xl rounded-tl-none">
-                            <div className="flex gap-1">
-                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce"></span>
-                            </div>
+                        <div className="bg-card/80 backdrop-blur-md border border-border/50 px-4 py-3 rounded-[20px] rounded-tl-[4px] shadow-sm">
+                            <LoadingPulse />
                         </div>
                     </motion.div>
                 )}
             </div>
 
-            <AISuggestions onSelect={(text) => setNewMessage(text)} />
+            {/* AI Suggestions */}
+            <div className="px-4 pb-2">
+                <AISuggestions onSelect={(text) => setNewMessage(text)} />
+            </div>
 
-            <form onSubmit={handleSendMessage} className="border-t border-border/40 p-4 flex gap-2 items-center bg-card/30 backdrop-blur-md">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileSelect}
-                />
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                >
-                    <Paperclip className="h-5 w-5" />
-                </Button>
+            {/* Composer */}
+            <div className="p-4 bg-card/80 backdrop-blur-xl border-t border-border/40">
+                <form onSubmit={handleSendMessage} className="flex gap-2 items-end max-w-4xl mx-auto">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileSelect}
+                    />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full h-10 w-10 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                    >
+                        <Paperclip className="h-5 w-5" />
+                    </Button>
 
-                <Input
-                    value={newMessage}
-                    onChange={(e) => {
-                        setNewMessage(e.target.value)
-                        handleTyping()
-                    }}
-                    placeholder="Message..."
-                    className="flex-1 rounded-full bg-background/50 border-border/50 focus-visible:ring-primary/50"
-                />
-                <Button type="submit" size="icon" className="rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all" disabled={!newMessage.trim() && !isUploading}>
-                    <Send className="h-4 w-4" />
-                </Button>
-            </form>
+                    <div className="flex-1 relative">
+                        <Input
+                            value={newMessage}
+                            onChange={(e) => {
+                                setNewMessage(e.target.value)
+                                handleTyping()
+                            }}
+                            placeholder="Message..."
+                            className="pr-10 rounded-2xl bg-muted/50 border-none focus-visible:ring-primary/30 min-h-[44px] py-3"
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1 h-9 w-9 rounded-full text-muted-foreground hover:text-primary"
+                        >
+                            <Smile className="h-5 w-5" />
+                        </Button>
+                    </div>
+
+                    {newMessage.trim() ? (
+                        <Button
+                            type="submit"
+                            size="icon"
+                            className="h-11 w-11 rounded-full shadow-lg shadow-primary/25 hover:scale-105 transition-all shrink-0"
+                        >
+                            <Send className="h-5 w-5 ml-0.5" />
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            className="h-11 w-11 rounded-full shrink-0"
+                        >
+                            <Mic className="h-5 w-5" />
+                        </Button>
+                    )}
+                </form>
+            </div>
         </div>
     )
 }
