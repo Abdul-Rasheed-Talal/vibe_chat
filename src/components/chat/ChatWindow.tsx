@@ -8,6 +8,8 @@ import { Send, ArrowLeft, Paperclip } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { sendMessage } from '@/app/actions/chat'
 import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { AISuggestions } from '@/components/chat/AISuggestions'
 
 type Message = {
     id: number
@@ -204,8 +206,8 @@ export function ChatWindow({
     }
 
     return (
-        <div className="flex h-full flex-col">
-            <div className="flex items-center border-b p-4 gap-4">
+        <div className="flex h-full flex-col bg-background/50 backdrop-blur-sm">
+            <div className="flex items-center border-b border-border/40 p-4 gap-4 bg-card/30 backdrop-blur-md">
                 <Link href="/direct" className="md:hidden">
                     <Button variant="ghost" size="icon">
                         <ArrowLeft className="h-5 w-5" />
@@ -214,58 +216,83 @@ export function ChatWindow({
 
                 {otherParticipant ? (
                     <>
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-10 w-10 ring-2 ring-primary/20">
                             <AvatarImage src={otherParticipant.avatar_url || ''} />
                             <AvatarFallback>{otherParticipant.username[0]?.toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="ml-2">
-                            <p className="font-semibold">{otherParticipant.username}</p>
+                            <p className="font-semibold glow-text">{otherParticipant.username}</p>
                             <p className="text-xs text-muted-foreground">
-                                {otherUserTyping ? 'Typing...' : 'Active now'}
+                                {otherUserTyping ? (
+                                    <span className="animate-pulse text-primary">Typing...</span>
+                                ) : 'Active now'}
                             </p>
                         </div>
                     </>
                 ) : (
                     <div className="ml-2">
-                        <p className="font-semibold">Group Chat</p>
-                        {otherUserTyping && <p className="text-xs text-muted-foreground">Someone is typing...</p>}
+                        <p className="font-semibold glow-text">Group Chat</p>
+                        {otherUserTyping && <p className="text-xs text-muted-foreground animate-pulse text-primary">Someone is typing...</p>}
                     </div>
                 )}
             </div>
 
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((msg) => {
-                    const isMe = msg.sender_id === currentUser.id
-                    return (
-                        <div
-                            key={msg.id}
-                            className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                        >
-                            <div
-                                className={`max-w-[70%] rounded-2xl px-4 py-2 ${isMe
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'bg-muted text-foreground'
-                                    }`}
+                <AnimatePresence initial={false}>
+                    {messages.map((msg) => {
+                        const isMe = msg.sender_id === currentUser.id
+                        return (
+                            <motion.div
+                                key={msg.id}
+                                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                             >
-                                {msg.attachments?.map((att, i) => (
-                                    <div key={i} className="mb-2">
-                                        {att.type === 'image' ? (
-                                            <img src={att.url} alt="attachment" className="max-w-full rounded-lg" />
-                                        ) : (
-                                            <a href={att.url} target="_blank" rel="noopener noreferrer" className="underline">
-                                                {att.name}
-                                            </a>
-                                        )}
-                                    </div>
-                                ))}
-                                {msg.content && <p>{msg.content}</p>}
+                                <div
+                                    className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm transition-all hover:scale-[1.02] ${isMe
+                                        ? 'bg-primary text-primary-foreground glow-box'
+                                        : 'bg-card border border-border/50 text-foreground'
+                                        }`}
+                                >
+                                    {msg.attachments?.map((att, i) => (
+                                        <div key={i} className="mb-2">
+                                            {att.type === 'image' ? (
+                                                <img src={att.url} alt="attachment" className="max-w-full rounded-lg" />
+                                            ) : (
+                                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="underline text-xs">
+                                                    {att.name}
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {msg.content && <p>{msg.content}</p>}
+                                </div>
+                            </motion.div>
+                        )
+                    })}
+                </AnimatePresence>
+                {otherUserTyping && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="flex justify-start"
+                    >
+                        <div className="bg-muted px-4 py-2 rounded-2xl rounded-tl-none">
+                            <div className="flex gap-1">
+                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce"></span>
                             </div>
                         </div>
-                    )
-                })}
+                    </motion.div>
+                )}
             </div>
 
-            <form onSubmit={handleSendMessage} className="border-t p-4 flex gap-2 items-center">
+            <AISuggestions onSelect={(text) => setNewMessage(text)} />
+
+            <form onSubmit={handleSendMessage} className="border-t border-border/40 p-4 flex gap-2 items-center bg-card/30 backdrop-blur-md">
                 <input
                     type="file"
                     ref={fileInputRef}
@@ -276,7 +303,7 @@ export function ChatWindow({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="rounded-full"
+                    className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
                 >
@@ -290,9 +317,9 @@ export function ChatWindow({
                         handleTyping()
                     }}
                     placeholder="Message..."
-                    className="flex-1 rounded-full"
+                    className="flex-1 rounded-full bg-background/50 border-border/50 focus-visible:ring-primary/50"
                 />
-                <Button type="submit" size="icon" className="rounded-full" disabled={!newMessage.trim() && !isUploading}>
+                <Button type="submit" size="icon" className="rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all" disabled={!newMessage.trim() && !isUploading}>
                     <Send className="h-4 w-4" />
                 </Button>
             </form>

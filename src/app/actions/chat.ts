@@ -189,3 +189,22 @@ export async function getOrCreateConversation(userId: string) {
 
   return newConv.id
 }
+
+export async function searchUsers(query: string) {
+  const supabase = await createClient()
+
+  if (!query || query.length < 2) return []
+
+  const { data: users, error } = await supabase
+    .from('profiles')
+    .select('id, username, full_name, avatar_url')
+    .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`)
+    .limit(10)
+
+  if (error) {
+    console.error('Error searching users:', error)
+    return []
+  }
+
+  return users
+}
