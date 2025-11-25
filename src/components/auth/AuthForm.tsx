@@ -26,12 +26,12 @@ export function AuthForm() {
     return (
         <div className="w-full max-w-md relative">
             {/* Animated background orbs */}
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-accent/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
-            <div className="relative bg-gradient-to-br from-zinc-900/90 via-zinc-900/95 to-black/90 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="relative bg-gradient-to-br from-zinc-900/90 via-zinc-900/95 to-black/90 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
                 {/* Top accent line */}
-                <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+                <div className="h-0.5 bg-gradient-to-r from-primary via-accent to-primary" />
 
                 <div className="p-8 space-y-6">
                     {/* Header */}
@@ -40,11 +40,11 @@ export function AuthForm() {
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ type: "spring", duration: 0.6 }}
-                            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4"
+                            className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-accent mb-3"
                         >
-                            <Sparkles className="w-8 h-8 text-white" />
+                            <Sparkles className="w-7 h-7 text-white" />
                         </motion.div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-white to-zinc-400 bg-clip-text text-transparent">
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
                             {isLogin ? 'Welcome Back' : 'Join Vibe Chat'}
                         </h1>
                         <p className="text-zinc-400 text-sm">
@@ -53,9 +53,9 @@ export function AuthForm() {
                     </div>
 
                     {/* Tab Toggle */}
-                    <div className="relative flex p-1 bg-zinc-800/50 rounded-2xl">
+                    <div className="relative flex p-1 bg-zinc-800/50 rounded-xl">
                         <motion.div
-                            className="absolute top-1 bottom-1 bg-gradient-to-r from-primary to-accent rounded-xl"
+                            className="absolute top-1 bottom-1 bg-gradient-to-r from-primary to-accent rounded-lg"
                             initial={false}
                             animate={{
                                 left: isLogin ? '0.25rem' : '50%',
@@ -65,49 +65,49 @@ export function AuthForm() {
                         />
                         <button
                             onClick={() => setIsLogin(true)}
-                            className={`relative z-10 flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors ${isLogin ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'
+                            className={`relative z-10 flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${isLogin ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'
                                 }`}
                         >
                             Login
                         </button>
                         <button
                             onClick={() => setIsLogin(false)}
-                            className={`relative z-10 flex-1 py-2.5 text-sm font-medium rounded-xl transition-colors ${!isLogin ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'
+                            className={`relative z-10 flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${!isLogin ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'
                                 }`}
                         >
                             Sign Up
                         </button>
                     </div>
 
-                    {/* Google Sign In */}
+                    {/* Google Sign In - FIXED */}
                     <form action={async () => { await signInWithGoogle() }}>
                         <Button
                             variant="outline"
-                            className="w-full h-12 bg-white hover:bg-zinc-100 text-zinc-900 border-none rounded-xl font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full h-11 bg-white hover:bg-zinc-50 text-zinc-900 border-none rounded-lg font-medium transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
                             type="submit"
                         >
-                            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            <svg className="w-4 h-4" viewBox="0 0 48 48">
+                                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
                             </svg>
-                            Continue with Google
+                            <span className="text-sm">Continue with Google</span>
                         </Button>
                     </form>
 
                     {/* Divider */}
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-zinc-700" />
+                            <div className="w-full border-t border-zinc-700/50" />
                         </div>
                         <div className="relative flex justify-center text-xs">
-                            <span className="px-3 bg-zinc-900 text-zinc-500 uppercase tracking-wider">Or</span>
+                            <span className="px-2 bg-zinc-900 text-zinc-500 uppercase tracking-wider">Or</span>
                         </div>
                     </div>
 
                     {/* Form */}
-                    <form action={handleSubmit} className="space-y-4">
+                    <form action={handleSubmit} className="space-y-3">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={isLogin ? 'login' : 'signup'}
@@ -115,45 +115,45 @@ export function AuthForm() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: isLogin ? 20 : -20 }}
                                 transition={{ duration: 0.2 }}
-                                className="space-y-4"
+                                className="space-y-3"
                             >
                                 {!isLogin && (
                                     <>
                                         <div className="relative group">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-primary transition-colors" />
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
                                             <Input
                                                 name="fullName"
                                                 placeholder="Full Name"
                                                 required={!isLogin}
                                                 disabled={isPending}
-                                                className="h-12 pl-12 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-primary/50 focus:ring-primary/20 rounded-xl transition-all"
+                                                className="h-11 pl-10 bg-zinc-800/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-lg transition-all"
                                             />
                                         </div>
                                         <div className="relative group">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-accent transition-colors" />
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-accent transition-colors" />
                                             <Input
                                                 name="username"
                                                 placeholder="Username"
                                                 required={!isLogin}
                                                 disabled={isPending}
-                                                className="h-12 pl-12 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-accent/50 focus:ring-accent/20 rounded-xl transition-all"
+                                                className="h-11 pl-10 bg-zinc-800/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-accent/50 focus:ring-1 focus:ring-accent/20 rounded-lg transition-all"
                                             />
                                         </div>
                                     </>
                                 )}
                                 <div className="relative group">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-primary transition-colors" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
                                     <Input
                                         name="email"
                                         type="email"
                                         placeholder="Email"
                                         required
                                         disabled={isPending}
-                                        className="h-12 pl-12 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-primary/50 focus:ring-primary/20 rounded-xl transition-all"
+                                        className="h-11 pl-10 bg-zinc-800/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-lg transition-all"
                                     />
                                 </div>
                                 <div className="relative group">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-accent transition-colors" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-accent transition-colors" />
                                     <Input
                                         name="password"
                                         type="password"
@@ -161,7 +161,7 @@ export function AuthForm() {
                                         required
                                         disabled={isPending}
                                         minLength={6}
-                                        className="h-12 pl-12 bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-accent/50 focus:ring-accent/20 rounded-xl transition-all"
+                                        className="h-11 pl-10 bg-zinc-800/50 border-zinc-700/50 text-white placeholder:text-zinc-500 focus:border-accent/50 focus:ring-1 focus:ring-accent/20 rounded-lg transition-all"
                                     />
                                 </div>
                             </motion.div>
@@ -171,7 +171,7 @@ export function AuthForm() {
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl"
+                                className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg"
                             >
                                 {error}
                             </motion.div>
@@ -179,12 +179,12 @@ export function AuthForm() {
 
                         <Button
                             type="submit"
-                            className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold rounded-xl shadow-lg shadow-primary/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold rounded-lg shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
                             disabled={isPending}
                         >
                             {isPending ? (
                                 <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     {isLogin ? 'Signing in...' : 'Creating account...'}
                                 </>
                             ) : (
