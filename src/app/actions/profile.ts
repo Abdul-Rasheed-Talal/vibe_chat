@@ -4,18 +4,23 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-export async function updateProfile(data: { username: string; full_name: string; avatar_url: string; status: string }) {
+export async function updateProfile(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return { error: 'Not authenticated' }
 
+    const username = formData.get('username') as string
+    const fullName = formData.get('fullName') as string
+    const avatarUrl = formData.get('avatarUrl') as string
+    const status = formData.get('status') as string
+
     const updates: any = {
         id: user.id,
-        full_name: data.full_name,
-        username: data.username,
-        avatar_url: data.avatar_url,
-        status: data.status,
+        full_name: fullName,
+        username: username,
+        avatar_url: avatarUrl,
+        status: status,
         updated_at: new Date().toISOString(),
     }
 
