@@ -60,65 +60,61 @@ export async function getConversations() {
 
   if (!user) return []
 
+  // Simplify query to avoid complex join issues
   const { data, error } = await supabase
     .from('conversation_participants')
-    .select(`
-      last_read_at,
-      conversation:conversations (
-        id,
-        last_message,
-        last_message_at,
-        is_group,
-        participants:conversation_participants (
-          user:profiles (
-            id,
-            username,
-            full_name,
-            avatar_url
-          )
-        ),
-        messages:messages(count)
-      )
-    `)
+    .select('conversation_id, last_read_at')
     .eq('user_id', user.id)
-    .order('conversation(last_message_at)', { ascending: false })
-
-  // Note: The above query for messages count is tricky because we need to filter messages > last_read_at
-  // Supabase/PostREST doesn't support complex join filtering easily in one go for "count where created_at > parent.last_read_at"
-  // We might need a separate query or a Postgres function.
-  // For now, let's fetch the conversations and then get unread counts in parallel or use a view.
-  // A view is cleaner, but let's try to do it in code for speed if N is small, or use a better query.
-
-  // Actually, let's use a separate query for unread counts or just fetch the last few messages? No, that's bad.
-  // Best approach: Create a RPC function or use a view.
-  // Let's stick to a simpler approach: fetch conversations, then for each, count unread.
-  // Or better: define a view in the migration? I already wrote the migration.
-  // Let's try to use the `rpc` approach if I had one, but I don't.
-  // Let's iterate for now (N+1 but N is small usually).
 
   if (error) {
-    console.error('Error fetching conversations:', error)
+    console.error('Error fetching conversations:', JSON.stringify(error, null, 2))
     return []
   }
 
-  const conversationsWithUnread = await Promise.all(data.map(async (item: any) => {
+  if (!data || data.length === 0) return []
+
+  // Manually fetch details to ensure data integrity
+  const conversationsWithDetails = await Promise.all(data.map(async (item: any) => {
+    const { data: conversation } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('id', item.conversation_id)
+      .single()
+
+    if (!conversation) return null
+
+    const { data: participants } = await supabase
+      .from('conversation_participants')
+      .select(`
+        user:profiles (
+          id,
+          username,
+          full_name,
+          avatar_url
+        )
+      `)
+      .eq('conversation_id', conversation.id)
+
+    // Get unread count
     const { count } = await supabase
       .from('messages')
       .select('*', { count: 'exact', head: true })
-      .eq('conversation_id', item.conversation.id)
+      .eq('conversation_id', conversation.id)
       .gt('created_at', item.last_read_at)
 
     return {
-      id: item.conversation.id,
-      last_message: item.conversation.last_message,
-      last_message_at: item.conversation.last_message_at,
-      is_group: item.conversation.is_group,
-      participants: item.conversation.participants.map((p: any) => p.user),
+      id: conversation.id,
+      last_message: conversation.last_message,
+      last_message_at: conversation.last_message_at,
+      is_group: conversation.is_group,
+      participants: participants?.map((p: any) => p.user) || [],
       unread_count: count || 0
     }
   }))
 
-  return conversationsWithUnread
+  return conversationsWithDetails.filter(Boolean).sort((a: any, b: any) =>
+    new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime()
+  )
 }
 
 export async function markAsRead(conversationId: string) {
