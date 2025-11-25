@@ -54,3 +54,18 @@ export async function getProfile() {
 
     return profile
 }
+
+export async function getSuggestedUsers() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return []
+
+    const { data: users } = await supabase
+        .from('profiles')
+        .select('id, username, full_name, avatar_url')
+        .neq('id', user.id)
+        .limit(20)
+
+    return users || []
+}

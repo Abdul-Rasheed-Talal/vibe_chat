@@ -37,9 +37,9 @@ export default function ProfilePage({ userProfile }: { userProfile: any }) {
                 .getPublicUrl(filePath)
 
             setAvatarUrl(publicUrl)
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error uploading avatar:', error)
-            alert('Error uploading avatar')
+            alert(`Error uploading avatar: ${error.message || JSON.stringify(error)}`)
         } finally {
             setLoading(false)
         }
