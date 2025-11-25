@@ -33,7 +33,8 @@ export default async function ConversationsPage() {
 
             <div className="space-y-2 mt-6">
                 {conversations.map((conversation: any) => {
-                    const otherParticipant = conversation.participants.find((p: any) => p.user.id !== user.id)?.user
+                    // The participants array from getConversations contains profiles directly
+                    const otherParticipant = conversation.participants.find((p: any) => p?.id !== user.id)
 
                     return (
                         <Link

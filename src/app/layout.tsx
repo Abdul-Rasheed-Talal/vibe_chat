@@ -118,12 +118,7 @@ export default function RootLayout({
     >
       <head>
         {/* Preload critical resources */}
-        <link
-          rel="preload"
-          href="/api/hello"
-          as="fetch"
-          crossOrigin="anonymous"
-        />
+
 
         {/* Dynamic OG image for social sharing */}
         <meta property="og:image:alt" content="Vibe Chat - Modern messaging experience with beautiful gradients and custom themes" />
@@ -133,6 +128,7 @@ export default function RootLayout({
 
         {/* Additional meta tags for better SEO */}
         <meta name="application-name" content="Vibe Chat" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Vibe Chat" />

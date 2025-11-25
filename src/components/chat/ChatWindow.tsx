@@ -14,7 +14,7 @@ import { MessageBubble } from '@/components/chat/MessageBubble'
 import { LoadingPulse } from '@/components/ui/loading-pulse'
 
 type Message = {
-    id: number
+    id: number | string
     content: string
     sender_id: string
     created_at: string
@@ -24,6 +24,7 @@ type Message = {
         url: string
         name: string
     }[]
+    isOptimistic?: boolean
 }
 
 type Profile = {
@@ -82,7 +83,28 @@ export function ChatWindow({
                     filter: `conversation_id=eq.${conversation.id}`,
                 },
                 (payload) => {
-                    setMessages((prev) => [...prev, payload.new as Message])
+                    const newMessage = payload.new as Message
+                    setMessages((prev) => {
+                        // If message already exists (by ID), ignore it
+                        if (prev.some(m => m.id === newMessage.id)) return prev
+
+                        // If it's my message, try to find and replace the optimistic version
+                        if (newMessage.sender_id === currentUser.id) {
+                            // Find optimistic message with same content
+                            const optimisticIndex = prev.findIndex(m =>
+                                m.isOptimistic &&
+                                m.content === newMessage.content
+                            )
+
+                            if (optimisticIndex !== -1) {
+                                const newMessages = [...prev]
+                                newMessages[optimisticIndex] = newMessage
+                                return newMessages
+                            }
+                        }
+
+                        return [...prev, newMessage]
+                    })
                 }
             )
             .on('broadcast', { event: 'typing' }, (payload) => {
@@ -151,7 +173,8 @@ export function ChatWindow({
                 sender_id: currentUser.id,
                 created_at: new Date().toISOString(),
                 conversation_id: conversation.id,
-                attachments: [attachment]
+                attachments: [attachment],
+                isOptimistic: true
             }
 
             setMessages((prev) => [...prev, optimisticMessage])
@@ -184,7 +207,8 @@ export function ChatWindow({
             content: newMessage,
             sender_id: currentUser.id,
             created_at: new Date().toISOString(),
-            conversation_id: conversation.id
+            conversation_id: conversation.id,
+            isOptimistic: true
         }
 
         setMessages((prev) => [...prev, optimisticMessage])
@@ -203,7 +227,7 @@ export function ChatWindow({
             console.error('Error sending message:', result.error)
             // Remove optimistic message or show error
             setMessages((prev) => prev.filter(m => m.id !== tempId))
-            alert('Failed to send message')
+            alert(result.error)
         }
     }
 

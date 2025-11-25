@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, User, Settings, LogOut, Moon, Sun, Menu, Search, Plus } from 'lucide-react'
+import { MessageSquare, User, Settings, LogOut, Moon, Sun, Menu, Search, Plus, Home as HomeIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { signout } from '@/app/login/actions'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -136,6 +136,7 @@ function SidebarContent({ pathname, theme, setTheme }: { pathname: string, theme
             </div>
 
             <nav className="flex-1 space-y-2 px-3 overflow-y-auto">
+                <NavItem href="/home" icon={<HomeIcon />} label="Home" active={pathname.startsWith('/home')} />
                 <NavItem href="/direct" icon={<MessageSquare />} label="Chats" active={pathname.startsWith('/direct')} />
                 <NavItem href="/profile" icon={<User />} label="Profile" active={pathname === '/profile'} />
                 <NavItem href="/settings" icon={<Settings />} label="Settings" active={pathname === '/settings'} />

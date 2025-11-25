@@ -6,7 +6,7 @@ import { format } from 'date-fns'
 
 type MessageBubbleProps = {
     message: {
-        id: number
+        id: number | string
         content: string
         created_at: string
         attachments?: { type: 'image' | 'file'; url: string; name: string }[]

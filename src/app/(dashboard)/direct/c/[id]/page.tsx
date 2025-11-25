@@ -5,14 +5,17 @@ import { LazyChatWindow } from '@/components/chat/LazyChatWindow'
 
 import { markAsRead } from '@/app/actions/chat'
 
-export default async function ChatPage({ params }: { params: { id: string } }) {
+export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) redirect('/login')
 
+    const { id } = await params
+    console.log('ChatPage: Loading conversation', id)
+
     // Fetch conversation and participants
-    const { data: conversation } = await supabase
+    const { data: conversation, error } = await supabase
         .from('conversations')
         .select(`
             id,
@@ -21,10 +24,17 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
                 user:profiles(*)
             )
         `)
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
-    if (!conversation) notFound()
+    if (error) {
+        console.error('ChatPage: Error fetching conversation:', JSON.stringify(error, null, 2))
+    }
+
+    if (!conversation) {
+        console.error('ChatPage: Conversation not found or access denied')
+        notFound()
+    }
 
     // Verify membership
     const isMember = conversation.participants.some((p: any) => p.user.id === user.id)
@@ -37,7 +47,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
     const { data: messages } = await supabase
         .from('messages')
         .select('*')
-        .eq('conversation_id', params.id)
+        .eq('conversation_id', id)
         .order('created_at', { ascending: false })
         .limit(50)
 
@@ -45,7 +55,7 @@ export default async function ChatPage({ params }: { params: { id: string } }) {
     const initialMessages = messages?.reverse() || []
 
     // Mark as read
-    await markAsRead(params.id)
+    await markAsRead(id, false)
 
     // Transform to match component type
     const typedConversation = {

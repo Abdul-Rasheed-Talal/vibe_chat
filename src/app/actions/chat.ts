@@ -19,28 +19,49 @@ export async function sendMessage(formData: FormData) {
     throw new Error('Unauthorized')
   }
 
-  const content = formData.get('content') as string
+  const content = formData.get('content') as string | null
   const conversationId = formData.get('conversationId') as string
-  const attachmentsStr = formData.get('attachments') as string
+  const attachmentsStr = formData.get('attachments') as string | null
 
-  const validated = sendMessageSchema.safeParse({ conversationId, content, attachments: attachmentsStr })
+  console.log('sendMessage received:', { conversationId, content, attachmentsStr })
+
+  const validated = sendMessageSchema.safeParse({
+    conversationId,
+    content: content ?? undefined,
+    attachments: attachmentsStr ?? undefined
+  })
 
   if (!validated.success) {
+    console.error('Validation error:', JSON.stringify(validated.error, null, 2))
     return { error: 'Invalid input' }
   }
 
   const attachments = validated.data.attachments ? JSON.parse(validated.data.attachments) : []
 
+  // Fetch conversation participants to find the receiver
+  const { data: participants, error: participantsError } = await supabase
+    .from('conversation_participants')
+    .select('user_id')
+    .eq('conversation_id', validated.data.conversationId)
+    .neq('user_id', user.id)
+    .single()
+
+  if (participantsError || !participants) {
+    console.error('Error fetching receiver:', participantsError)
+    return { error: 'Failed to determine receiver' }
+  }
+
   const { error } = await supabase.from('messages').insert({
     conversation_id: validated.data.conversationId,
     sender_id: user.id,
+    receiver_id: participants.user_id,
     content: validated.data.content || '',
     attachments: attachments
   })
 
   if (error) {
-    console.error('Error sending message:', error)
-    return { error: 'Failed to send message' }
+    console.error('Error sending message:', JSON.stringify(error, null, 2))
+    return { error: `Failed to send message: ${error.message || JSON.stringify(error)}` }
   }
 
   // Update conversation last_message
@@ -117,7 +138,7 @@ export async function getConversations() {
   )
 }
 
-export async function markAsRead(conversationId: string) {
+export async function markAsRead(conversationId: string, shouldRevalidate = true) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -129,7 +150,9 @@ export async function markAsRead(conversationId: string) {
     .eq('conversation_id', conversationId)
     .eq('user_id', user.id)
 
-  revalidatePath('/direct')
+  if (shouldRevalidate) {
+    revalidatePath('/direct')
+  }
 }
 
 export async function getOrCreateConversation(userId: string) {
@@ -168,22 +191,16 @@ export async function getOrCreateConversation(userId: string) {
     }
   }
 
-  // Create new conversation
-  const { data: newConv, error: createError } = await supabase
-    .from('conversations')
-    .insert({ is_group: false })
-    .select()
-    .single()
+  // Create new conversation using RPC
+  const { data: newConversationId, error: createError } = await supabase
+    .rpc('create_new_conversation', { other_user_id: userId })
 
-  if (createError) throw createError
+  if (createError) {
+    console.error('Error creating conversation:', createError)
+    throw createError
+  }
 
-  // Add participants
-  await supabase.from('conversation_participants').insert([
-    { conversation_id: newConv.id, user_id: user.id },
-    { conversation_id: newConv.id, user_id: userId }
-  ])
-
-  return newConv.id
+  return newConversationId
 }
 
 export async function searchUsers(query: string) {

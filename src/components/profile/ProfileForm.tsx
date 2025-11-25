@@ -9,12 +9,15 @@ import { createClient } from '@/lib/supabase/client'
 import { Loader2, Upload, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function ProfilePage({ userProfile }: { userProfile: any }) {
+export default function ProfilePage({ userProfile, userId }: { userProfile: any, userId: string }) {
     const [loading, setLoading] = useState(false)
     const [avatarUrl, setAvatarUrl] = useState(userProfile?.avatar_url || '')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const router = useRouter()
     const supabase = createClient()
+
+    // If profile is missing, we still want to show the form so they can create it.
+    // The updateProfile action now handles upsert.
 
     const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -23,11 +26,11 @@ export default function ProfilePage({ userProfile }: { userProfile: any }) {
         setLoading(true)
         try {
             const fileExt = file.name.split('.').pop()
-            const fileName = `${userProfile.id}/${Math.random()}.${fileExt}`
+            const fileName = `${userId}/${Math.random()}.${fileExt}`
             const filePath = `${fileName}`
 
             const { error: uploadError } = await supabase.storage
-                .from('avatars') // Ensure 'avatars' bucket exists or use 'attachments'
+                .from('avatars')
                 .upload(filePath, file)
 
             if (uploadError) throw uploadError
@@ -97,8 +100,7 @@ export default function ProfilePage({ userProfile }: { userProfile: any }) {
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium">Status / Bio</label>
-                    <Input name="status" placeholder="What's your vibe?" />
-                    {/* Note: 'status' column needs to be added to DB if not present */}
+                    <Input name="status" defaultValue={userProfile?.status} placeholder="What's your vibe?" />
                 </div>
 
                 <Button type="submit" className="w-full glow-box" disabled={loading}>
