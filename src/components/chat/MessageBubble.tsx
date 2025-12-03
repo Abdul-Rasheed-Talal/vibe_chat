@@ -1,27 +1,78 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
+import { MoreVertical, Trash2 } from 'lucide-react'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 type MessageBubbleProps = {
     message: {
         id: number | string
         content: string
         created_at: string
+        deleted_at?: string | null
         attachments?: { type: 'image' | 'file' | 'audio'; url: string; name: string }[]
     }
     isMe: boolean
     showAvatar?: boolean
+    onDelete?: (id: number | string) => void
 }
 
-export function MessageBubble({ message, isMe, showAvatar }: MessageBubbleProps) {
+export function MessageBubble({ message, isMe, showAvatar, onDelete }: MessageBubbleProps) {
+    if (message.deleted_at) {
+        return (
+            <div
+                className={cn(
+                    "flex w-full mb-2",
+                    isMe ? "justify-end" : "justify-start"
+                )}
+            >
+                <div
+                    className={cn(
+                        "relative max-w-[75%] px-4 py-3 text-sm rounded-2xl shadow-sm italic text-muted-foreground border border-border/30",
+                        isMe
+                            ? "bg-primary/10 rounded-tr-sm"
+                            : "bg-muted/50 rounded-tl-sm"
+                    )}
+                >
+                    This message was deleted
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div
             className={cn(
-                "flex w-full mb-2",
+                "flex w-full mb-2 group relative",
                 isMe ? "justify-end" : "justify-start"
             )}
         >
+            {/* Delete Option for Me */}
+            {isMe && onDelete && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-1/2 -translate-y-1/2 -left-8">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="p-1 hover:bg-muted rounded-full text-muted-foreground">
+                                <MoreVertical className="h-4 w-4" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                className="text-destructive focus:text-destructive cursor-pointer"
+                                onClick={() => onDelete(message.id)}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            )}
+
             <div
                 className={cn(
                     "relative max-w-[75%] px-4 py-3 text-sm rounded-2xl shadow-sm",

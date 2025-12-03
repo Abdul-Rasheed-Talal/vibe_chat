@@ -252,3 +252,25 @@ export async function getTotalUnreadCount() {
 
   return totalUnread
 }
+
+export async function deleteMessage(messageId: string | number, conversationId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Unauthorized' }
+  }
+
+  const { error } = await supabase
+    .from('messages')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', messageId)
+    .eq('sender_id', user.id) // Ensure user owns the message
+
+  if (error) {
+    console.error('Error deleting message:', error)
+    return { error: 'Failed to delete message' }
+  }
+
+  revalidatePath(`/direct/${conversationId}`)
+}

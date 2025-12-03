@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Send, ArrowLeft, Paperclip, Smile, Mic } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { sendMessage } from '@/app/actions/chat'
+import { sendMessage, deleteMessage } from '@/app/actions/chat'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AISuggestions } from '@/components/chat/AISuggestions'
@@ -27,6 +27,7 @@ type Message = {
         name: string
     }[]
     isOptimistic?: boolean
+    deleted_at?: string | null
 }
 
 type Profile = {
@@ -104,6 +105,21 @@ export function ChatWindow({
                         }
                         return [...prev, newMessage]
                     })
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversation.id}`,
+                },
+                (payload) => {
+                    const updatedMessage = payload.new as Message
+                    setMessages((prev) => prev.map(m =>
+                        m.id === updatedMessage.id ? updatedMessage : m
+                    ))
                 }
             )
             .on('broadcast', { event: 'typing' }, (payload) => {
@@ -294,6 +310,22 @@ export function ChatWindow({
         }
     }
 
+    const handleDeleteMessage = async (messageId: number | string) => {
+        // Optimistic update
+        setMessages(prev => prev.map(m =>
+            m.id === messageId
+                ? { ...m, deleted_at: new Date().toISOString() }
+                : m
+        ))
+
+        const result = await deleteMessage(messageId, conversation.id)
+        if (result?.error) {
+            console.error('Error deleting message:', result.error)
+            alert('Failed to delete message')
+            // Revert optimistic update (optional, or just let revalidation fix it)
+        }
+    }
+
     return (
         <div className="flex h-full flex-col bg-background/50 backdrop-blur-sm relative">
             {/* Header */}
@@ -349,6 +381,7 @@ export function ChatWindow({
                                 key={msg.id}
                                 message={msg}
                                 isMe={msg.sender_id === currentUser.id}
+                                onDelete={handleDeleteMessage}
                             />
                         </div>
                     )}
