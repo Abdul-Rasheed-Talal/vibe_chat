@@ -47,16 +47,16 @@ export function MessageBubble({ message, isMe, showAvatar, onDelete }: MessageBu
     return (
         <div
             className={cn(
-                "flex w-full mb-2 group relative",
+                "flex w-full mb-2 group items-center gap-2",
                 isMe ? "justify-end" : "justify-start"
             )}
         >
             {/* Delete Option for Me */}
             {isMe && onDelete && (
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-1/2 -translate-y-1/2 -left-8">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button className="p-1 hover:bg-muted rounded-full text-muted-foreground">
+                            <button className="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
                                 <MoreVertical className="h-4 w-4" />
                             </button>
                         </DropdownMenuTrigger>
