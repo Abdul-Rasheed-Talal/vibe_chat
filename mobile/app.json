@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Vibe",
+    "slug": "mobile",
+    "scheme": "vibeapp",
+    "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#09090b"
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/92f38d54-bb65-4b0d-ab1e-07f5247281be"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vibe.chat"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#09090b"
+      },
+      "package": "com.vibe.chat",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/icon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "92f38d54-bb65-4b0d-ab1e-07f5247281be"
+      }
+    },
+    "owner": "abdul-rasheed-talal"
+  }
+}

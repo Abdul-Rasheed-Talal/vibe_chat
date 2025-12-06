@@ -1,0 +1,37 @@
+{
+    "cli": {
+        "version": ">= 12.5.1",
+        "appVersionSource": "local"
+    },
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "channel": "development"
+        },
+        "preview": {
+            "distribution": "internal",
+            "channel": "preview",
+            "android": {
+                "buildType": "apk"
+            },
+            "env": {
+                "EXPO_PUBLIC_SUPABASE_URL": "https://poinneeautppohsjmhqr.supabase.co",
+                "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvaW5uZWVhdXRwcG9oc2ptaHFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NTYyNzAsImV4cCI6MjA3OTUzMjI3MH0.pawp_F8iCaHg93P-vgfxKMMfRNSKl7L2O6-6ErfIAsg"
+            }
+        },
+        "production": {
+            "channel": "production",
+            "android": {
+                "buildType": "app-bundle"
+            },
+            "env": {
+                "EXPO_PUBLIC_SUPABASE_URL": "https://poinneeautppohsjmhqr.supabase.co",
+                "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvaW5uZWVhdXRwcG9oc2ptaHFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5NTYyNzAsImV4cCI6MjA3OTUzMjI3MH0.pawp_F8iCaHg93P-vgfxKMMfRNSKl7L2O6-6ErfIAsg"
+            }
+        }
+    },
+    "submit": {
+        "production": {}
+    }
+}
