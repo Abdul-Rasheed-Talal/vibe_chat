@@ -17,4 +17,6 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
         console.log('ThreadPage: Redirecting to', `/direct/c/${conversationId}`)
         redirect(`/direct/c/${conversationId}`)
     }
+
+    redirect('/direct')
 }

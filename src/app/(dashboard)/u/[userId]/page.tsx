@@ -30,7 +30,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ us
     // Check if conversation already exists
     const conversations = await getConversations()
     const existingConversation = conversations.find((c: any) =>
-        c.participants.some((p: any) => p.user?.id === profile.id)
+        c.participants.some((p: any) => p?.id === profile.id)
     )
 
     const chatLink = existingConversation

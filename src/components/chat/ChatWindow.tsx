@@ -65,7 +65,7 @@ export function ChatWindow({
 
     // Identify the other participant (for 1:1)
     const otherParticipant = conversation.participants.find(
-        (p) => p.user.id !== currentUser.id
+        (p) => p.user?.id !== currentUser.id
     )?.user
 
     useEffect(() => {
